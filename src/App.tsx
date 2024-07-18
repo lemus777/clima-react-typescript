@@ -5,7 +5,7 @@ import useWeather from "./hooks/useWeather"
 
 function App() {
 
-  const { weather, fetchWeather } = useWeather()
+  const { weather, fetchWeather, hasWeatherData } = useWeather()
 
   return (
     <>
@@ -15,9 +15,7 @@ function App() {
         <Form
           fetchWeather={fetchWeather}
         />
-        <WeatherDetail
-          weather={weather}
-        />
+        {hasWeatherData && <WeatherDetail weather={weather} />}
       </div>
     </>
   )
