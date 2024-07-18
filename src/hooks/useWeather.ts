@@ -1,7 +1,8 @@
 import axios from "axios"
-// import { z } from "zod"
-import { object, string, number, InferOutput, parse } from "valibot"
+import { z } from "zod"
+// import { object, string, number, InferOutput, parse } from "valibot"
 import { SearchType } from "../types"
+import { useState } from "react"
 
 // Type guard o assertion
 // function isWeatherResponse(weather : unknown) : weather is Weather {
@@ -16,7 +17,7 @@ import { SearchType } from "../types"
 // }
 
 // Zod
-/* const Weather = z.object({
+const Weather = z.object({
   name: z.string(),
   main: z.object({
     temp: z.number(),
@@ -25,21 +26,30 @@ import { SearchType } from "../types"
   })
 })
   
-type Weather = z.infer<typeof Weather>*/
+export type Weather = z.infer<typeof Weather>
 
 // Valibot
-const WeatherSchema = object({
+/* const WeatherSchema = object({
   name: string(),
   main: object({
     temp: number(),
     temp_max: number(),
     temp_min: number()
   })
-})
+}) */
 
-type Weather = InferOutput<typeof WeatherSchema>
+// type Weather = InferOutput<typeof WeatherSchema>
 
 export default function useWeather() {
+
+  const [weather, setWeather] = useState<Weather>({
+    name: '',
+    main: {
+      temp: 0,
+      temp_max: 0,
+      temp_min: 0
+    }
+  })
 
   const fetchWeather = async (search : SearchType) => {
 
@@ -69,23 +79,20 @@ export default function useWeather() {
       // }
 
       // Zod
-      // const {data: weatherResult} = await axios(weatherUrl)
-      // const result = Weather.safeParse(weatherResult)
-      // if (result.success) {
-      //   console.log(result.data.name)
-      //   console.log(result.data.main.temp)
-      // } else {
-      //   console.log('Respuesta mal formada')
-      // }
+      const {data: weatherResult} = await axios(weatherUrl)
+      const result = Weather.safeParse(weatherResult)
+      if (result.success) {
+        setWeather(result.data)
+      }
 
       // Valibot
-      const { data: weatherResult } = await axios(weatherUrl)
+      /* const { data: weatherResult } = await axios(weatherUrl)
       const result = parse(WeatherSchema, weatherResult)
       if (result) {
         console.log(result.name)
       } else {
         console.log('Respuesta mal formada')
-      }
+      } */
       
     } catch (error) {
       console.log(error)
@@ -93,6 +100,7 @@ export default function useWeather() {
   }
 
   return {
+    weather,
     fetchWeather
   }
 }
